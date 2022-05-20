@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd 
 import seaborn as sb 
+import matplotlib.pyplot as plt
 
 def run_eda() :
     st.subheader('데이터 분석')
@@ -31,7 +32,21 @@ def run_eda() :
 
     # 유저가 선택한 컬럼들만, pairplot 그리고, 그아래 상관 계수를 보여준다.
     selected_list = st.multiselect('컬럼들 선택',col_list)
-    if len(selected_list) != 0 :
+    if len(selected_list) > 1 :
         fig1 = sb.pairplot(data=car_df[selected_list])
         st.pyplot(fig1)
-    
+        st.text('선택하신 컬럼끼리의 상관계수 입니다.')    
+        st.dataframe(car_df[selected_list].corr())
+
+        fig2 = plt.figure()
+        sb.heatmap(data=car_df[selected_list].corr(),annot=True,fmt='.2%',vmin=-1,vmax=1,cmap='coolwarm',linewidths=0.5 )
+        st.pyplot(fig2)
+
+    # 고객이름 컬럼을 검색할수 있도록 만듭니다.
+    # he 라고 넣으면, he 가 이름에 들어있는 고객들의 데이터를 가져옵니다.
+    # 1.유저한테 검색어를 입력 받는다.
+        word = st.text_input('이름을 검색할 단어를 입력하세요')
+    # 2. 검색어를 고객이름 컬럼에 들어있는 데이터를 가져온다.abs(
+        result = car_df.loc[car_df['Customer Name'].str.lower().str.contains(word.lower()),]
+    # 3. 화면에 보여준다.
+        st.dataframe(result)
